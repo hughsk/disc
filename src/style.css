@@ -1,0 +1,126 @@
+html, body {
+  font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-weight: 100;
+  position: relative;
+  background: #6A4A3C;
+  margin:0;
+  padding:0;
+  color: #fff;
+  animation: background 2s;
+}
+
+.content {
+  animation: content 4s;
+}
+
+.content img {
+  display: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 200;
+}
+
+h1 {
+  font-weight: 200;
+  font-size: 2.82em;
+  text-align: center;
+  margin: 0 auto;
+  width: 600px;
+  padding-bottom: 0.5em;
+  margin-bottom: 1em;
+  letter-spacing: 0.075em;
+  border-bottom: 1px dotted rgba(255,255,255,0.75);
+  padding-top: 0.775em;
+}
+
+h1, h2 {
+  box-shadow: 0 11px 10px -10px rgba(0,0,0,0.25);
+}
+
+h2 {
+  border-bottom: 1px dotted rgba(255,255,255,0.75);
+  padding-bottom: 0.25em;
+  padding-top: 1em;
+}
+
+.chart {
+  margin: 0 auto;
+}
+
+.markdown {
+  width: 600px;
+  margin: 0 auto;
+  line-height: 1.65em;
+  font-size: 1.15em;
+}
+
+.markdown a {
+  color: #EDC951;
+  text-decoration: none;
+  border-bottom: 1px solid #EDC951;
+}
+
+.markdown pre {
+  padding: 1em;
+  background: rgba(255,255,255,0.1);
+  font-weight: 200;
+}
+
+.modes {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+}
+
+.scale-list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow:hidden;
+}
+.scale-icon:hover {
+  opacity: 1;
+}
+.scale-icon {
+  background-position: right center;
+  height: 48px;
+  line-height: 48px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  padding-right: 64px;
+  font-size: 1.2em;
+  text-align: right;
+  background-repeat: no-repeat;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+.scale-icon:hover span {
+  opacity: 1;
+  left: 0;
+}
+.scale-icon span {
+  position: relative;
+  left: 100px;
+  opacity: 0;
+  transition: opacity 0.2s, left 0.2s;
+}
+.scale-size  { background-image: inline(icon-size.png); }
+.scale-count { background-image: inline(icon-count.png); }
+
+pre, code {
+  font-family: 'Source Code Pro', 'Courier New', monospace;
+  font-size: 14px;
+}
+
+@keyframes background {
+    0% { background-color:#000; }
+   20% { background-color:#000; }
+  100% { background-color:#6A4A3C; }
+}
+
+@keyframes content {
+    0% { opacity: 0; }
+   50% { opacity: 0; }
+  100% { opacity: 1; }
+}

@@ -1,0 +1,56 @@
+{
+  "name": "disc",
+  "version": "0.0.0",
+  "description": "A tool for analyzing the module tree of a browserify bundle or node project",
+  "main": "index.js",
+  "scripts": {
+    "prepublish": "mkdir -p build && npm run browserify && npm run rework && npm run bundle-demo",
+    "browserify": "browserify src/index.js | uglifyjs -c 2> /dev/null > build/bundle.js",
+    "bundle-demo": "node lib/bundle-demo > index.html",
+    "rework": "node lib/bundle-css > build/style.css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/hughsk/disc.git"
+  },
+  "bin": {
+    "discify": "bin/discify"
+  },
+  "author": "Hugh Kennedy <hughskennedy@gmail.com> (http://hughskennedy.com/)",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "dependencies": {
+    "file-size-tree": "0.0.0",
+    "module-deps": "~1.0.1",
+    "detective": "~2.1.2",
+    "deps-sort": "~0.1.1",
+    "commondir": "0.0.1",
+    "once": "~1.1.1",
+    "optimist": "~0.6.0",
+    "opener": "~1.3.0"
+  },
+  "devDependencies": {
+    "prettysize": "0.0.3",
+    "domready": "~0.2.12",
+    "d3": "~3.2.7",
+    "marked": "~0.2.9",
+    "browserify": "~2.25.1",
+    "rework": "~0.17.2",
+    "clean-css": "~1.0.12",
+    "uglify-js": "~2.3.6",
+    "btoa": "~1.1.1"
+  },
+  "keywords": [
+    "analyze",
+    "analytics",
+    "directory",
+    "file",
+    "modules",
+    "tree",
+    "tool",
+    "browserify",
+    "size",
+    "structure",
+    "visualize"
+  ]
+}
