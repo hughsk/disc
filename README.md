@@ -1,6 +1,6 @@
 # disc #
 
-![disc screenshot](http://hughsk.github.io/disc/img/screenshot.png)
+[![disc screenshot](http://hughsk.github.io/disc/img/screenshot.png)](http://hughsk.github.io/disc)
 
 Disc is a tool for analyzing the module tree of
 [browserify](http://browserify.org) project bundles. It's especially handy
