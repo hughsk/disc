@@ -94,7 +94,7 @@ function bundled() {
 }
 
 function dirsizes(child) {
-  return child.size = child.size || child.children.reduce(function(size, child) {
-    return size + (child.size || dirsizes(child))
+  return child.size = "size" in child ? child.size : child.children.reduce(function(size, child) {
+    return size + ("size" in child ? child.size : dirsizes(child))
   }, 0)
 }
