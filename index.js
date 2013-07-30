@@ -1,5 +1,6 @@
 var fileTree = require('file-size-tree')
 var detective = require('detective')
+var quotemeta = require('quotemeta')
 var commondir = require('commondir')
 var mdeps = require('module-deps')
 var sdeps = require('deps-sort')
@@ -12,6 +13,12 @@ module.exports = {
   , bundle: bundle
 }
 
+var ignore = Object.keys(require('browser-builtins')).concat([
+  'os', 'module'
+])
+ignore = '^(?:' + ignore.join('|') + ')$'
+ignore = new RegExp(ignore, 'i')
+
 function json(files, transforms, callback) {
   var found = []
 
@@ -22,7 +29,7 @@ function json(files, transforms, callback) {
   mdeps(files, {
       transform: transforms
     , filter: function(module) {
-      return !/^(?:module|path|fs|child_process|stream|events|util|http|url|zlib|buffer)$/i.test(module)
+      return !ignore.test(module)
     }
   }).pipe(sdeps())
     .once('error', callback)
