@@ -22,7 +22,6 @@
   "dependencies": {
     "file-size-tree": "0.0.0",
     "module-deps": "~1.0.1",
-    "detective": "~2.1.2",
     "deps-sort": "~0.1.1",
     "commondir": "0.0.1",
     "once": "~1.1.1",
