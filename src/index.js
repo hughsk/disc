@@ -2,6 +2,10 @@ var domready = require('domready')
   , pretty = require('prettysize')
   , d3 = require('d3')
 
+var specials = {
+  'node_modules': '#FF8553'
+}
+
 var pallette = [
     '#00A0B0'
   , '#CC333F'
@@ -9,13 +13,20 @@ var pallette = [
   , '#EDC951'
 ]
 
+var colors = []
+  .concat(pallette.map(lighten(0.7)))
+  .concat(pallette.map(lighten(1.4)))
+  .concat(pallette.map(lighten(2)))
+
+Object.keys(specials).forEach(function(key) {
+  var idx = colors.indexOf(specials[key].toLowerCase())
+  if (idx === -1) return
+  colors.splice(idx, 1)
+})
+
 var color = d3.scale
   .ordinal()
-  .range([]
-    .concat(pallette.map(lighten(0.7)))
-    .concat(pallette.map(lighten(1.4)))
-    .concat(pallette.map(lighten(2)))
-  )
+  .range(colors)
 
 function lighten(n) {
   return function(c) {
@@ -112,7 +123,8 @@ domready(function() {
     .style('stroke-width', '0')
     .style('fill-rule', 'evenodd')
     .style('fill', function(d) {
-      return d.c = color((d.children ? d : d.parent).name)
+      var name = d.children ? d.name : d.parent.name
+      return d.c = specials[name] || color(name)
     })
     .each(function(d) {
       d.x0 = d.x
