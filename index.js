@@ -1,5 +1,5 @@
+var builtins = require('browser-builtins')
 var fileTree = require('file-size-tree')
-var detective = require('detective')
 var quotemeta = require('quotemeta')
 var commondir = require('commondir')
 var mdeps = require('module-deps')
@@ -13,14 +13,13 @@ module.exports = {
   , bundle: bundle
 }
 
-var ignore = Object.keys(require('browser-builtins')).concat([
-  'os', 'module'
-])
+var ignore = Object.keys(builtins).concat(['os', 'module', 'cluster'])
 ignore = '^(?:' + ignore.join('|') + ')$'
 ignore = new RegExp(ignore, 'i')
 
 function json(files, transforms, callback) {
   var found = []
+    , foundbuiltins = []
 
   files = toarray(files)
   transforms = toarray(transforms)
@@ -29,6 +28,9 @@ function json(files, transforms, callback) {
   mdeps(files, {
       transform: transforms
     , filter: function(module) {
+      if (builtins[module]) {
+        insert(foundbuiltins, builtins[module])
+      }
       return !ignore.test(module)
     }
   }).pipe(sdeps())
@@ -39,6 +41,13 @@ function json(files, transforms, callback) {
           name: root
         , children: fileTree(found)
       }
+
+      foundbuiltins.forEach(function(builtin) {
+        tree.children.push({
+            name: path.basename(builtin)
+          , size: fs.statSync(builtin).size
+        })
+      })
 
       dirsizes(tree)
       callback(null, tree)
@@ -104,4 +113,9 @@ function dirsizes(child) {
   return child.size = "size" in child ? child.size : child.children.reduce(function(size, child) {
     return size + ("size" in child ? child.size : dirsizes(child))
   }, 0)
+}
+
+function insert(array, value) {
+  if (array.indexOf(value) === -1) array.push(value)
+  return array
 }
