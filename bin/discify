@@ -4,6 +4,7 @@ var optimist = require('optimist')
 var open = require('opener')
 var path = require('path')
 var disc = require('../')
+var fs = require('fs')
 
 var argv = optimist
   .usage('$0 [file(s)...] {options}')
