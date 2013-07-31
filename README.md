@@ -39,14 +39,14 @@ with the `browserify` command-line tool - if your project uses source
 transforms, you should include those too, e.g:
 
 ``` bash
-disc -t coffeeify index.coffee
+discify -t coffeeify index.coffee
 ```
 
 By default, disc will spit out a standalone HTML file that you can open
 in your browser:
 
 ``` bash
-disc index.js > stats.html
+discify index.js > stats.html
 open stats.html
 ```
 
@@ -55,7 +55,7 @@ or `-O` flags to start a local server and open it up in your browser
 automatically:
 
 ``` bash
-disc index.js --open
+discify index.js --open
 ```
 
 ## Module API ##
@@ -69,6 +69,6 @@ Calls `callback(err, html)` with a standalone HTML file. You can pass the
 following options to the function to modify the output:
 
 * `files`: the files to parse/traverse
-* `markdown`: HTML to include below the chart.
+* `footer`: HTML to include below the chart.
 * `transforms`: transform streams to pass to
   [module-deps](http://ghub.io/module-deps).
