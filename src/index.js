@@ -1,42 +1,7 @@
 var domready = require('domready')
   , pretty = require('prettysize')
+  , schemes = require('./schemes')
   , d3 = require('d3')
-
-var specials = {
-  'node_modules': '#FF8553'
-}
-
-var pallette = [
-    '#00A0B0'
-  , '#CC333F'
-  , '#EB6841'
-  , '#EDC951'
-]
-
-var colors = []
-  .concat(pallette.map(lighten(0.7)))
-  .concat(pallette.map(lighten(1.4)))
-  .concat(pallette.map(lighten(2)))
-
-Object.keys(specials).forEach(function(key) {
-  var idx = colors.indexOf(specials[key].toLowerCase())
-  if (idx === -1) return
-  colors.splice(idx, 1)
-})
-
-var color = d3.scale
-  .ordinal()
-  .range(colors)
-
-function lighten(n) {
-  return function(c) {
-    return String(d3.rgb(c).brighter(n))
-  }
-}
-
-function angle(x) {
-  return x
-}
 
 var arc = d3.svg.arc()
   .startAngle(function(d) { return angle(d.x) })
@@ -62,6 +27,45 @@ domready(function() {
       .attr('height', height)
     .append('g')
       .attr('transform', 'translate(' + width / 2 + ',' + height * .52 + ')')
+
+  var palettes = d3.select('.palette-wrap')
+    .style('top', String(window.innerHeight - (schemes.length - 1) * 56 - 16) + 'px')
+    .selectAll('.palette')
+    .data(schemes)
+    .enter()
+    .append('svg')
+    .style('display', 'inline-block')
+    .classed('palette', true)
+    .on('click', function(d, i) {
+      useScheme(i, path.transition()
+        .duration(600)
+        .ease(bounce_high, 1000)
+        .delay(function(d, i) {
+          return d.x * 100 + d.y / maxdepth * 0.06125
+        })
+      )
+    })
+
+  palettes.append('rect')
+    .attr('width', 23)
+    .attr('height', 48)
+    .style('fill', function(d) {
+      return d.background
+    })
+
+  palettes.selectAll('.color')
+    .data(function(d) { return d.all })
+    .enter()
+    .append('rect')
+    .style('fill', function(d) { return d })
+    .attr('x', 25)
+    .attr('y', function(d, i, j) {
+      return 48 * i / schemes[j].all.length - 1
+    })
+    .attr('width', 22)
+    .attr('height', function(d, i, j) {
+      return 48 / schemes[j].all.length - 1
+    })
 
   var partition = d3.layout.partition()
       .sort(null)
@@ -122,15 +126,60 @@ domready(function() {
     .style('stroke', '#2B2B2B')
     .style('stroke-width', '0')
     .style('fill-rule', 'evenodd')
-    .style('fill', function(d) {
-      var name = d.children ? d.name : d.parent.name
-      return d.c = specials[name] || color(name)
-    })
     .each(function(d) {
       d.x0 = d.x
       d.dx0 = d.dx
       d.el = this
     })
+
+  //
+  // Colour scheme functionality.
+  //
+  // Triggered immediately with the default
+  // scheme, must be passed a d3 selection.
+  //
+  var background
+    , scheme = 0
+    , specials
+    , color
+
+  useScheme(scheme, path)
+  function useScheme(n, path) {
+    background = schemes[n].background
+    specials = schemes[n].specials
+
+    palettes
+      .transition()
+      .ease('bounce')
+      .duration(500)
+      .attr('height', function(d, i) {
+        return i === n ? 0 : 48
+      })
+
+    ;[d3.select('body')
+    , d3.select('html')].forEach(function(el) {
+      el.transition()
+        .ease('sin-in-out')
+        .duration(600)
+        .style('background', background)
+    })
+
+    var colors = schemes[n].main
+    Object.keys(specials).forEach(function(key) {
+      var idx = colors.indexOf(specials[key].toLowerCase())
+      if (idx === -1) return
+      colors.splice(idx, 1)
+    })
+
+    color = d3.scale
+      .ordinal()
+      .range(colors)
+
+    path.style('fill', function(d) {
+      var name = d.children ? d.name : d.parent.name
+      return d.c = schemes[n].modifier.call(d, specials[name] || color(name), root)
+    })
+  }
 
   path.transition()
     .duration(1000)
@@ -170,6 +219,7 @@ domready(function() {
       .ease('back-out', 10)
       .duration(500)
       .attrTween('d', highlight.tween)
+      .style('fill', function(d) { return d.c })
 
     if (d.children) {
       var i = d.children.length
@@ -185,6 +235,8 @@ domready(function() {
       .ease('back-out', 4)
       .duration(500)
       .attrTween('d', unhighlight.tween)
+      .style('fill', function(d) { return d.c })
+
     if (d.children) {
       var i = d.children.length
       while (i--) unhighlight(d.children[i])
@@ -214,64 +266,76 @@ domready(function() {
         .duration(1500)
         .attrTween('d', arcTween)
   })
-
-  // Interpolate the arcs in data space.
-  function arcTween(a) {
-    var i = d3.interpolate({x: a.x0, dx: a.dx0}, a)
-    return function(t) {
-      var b = i(t)
-      a.x0 = b.x
-      a.dx0 = b.dx
-      return arc(b)
-    }
-  }
-
-  //
-  // A more complex arc tween for handling
-  // hover states. Returns a tween function
-  // which returns an interpolator for each
-  // datum.
-  //
-  function hoverTween(z) {
-    var ht = 0
-    var harc = d3.svg.arc()
-      .startAngle(function(d) {
-        return angle(d.x)
-      })
-      .endAngle(function(d) {
-        return angle(d.x
-          + (1 - ht) * Math.max(d.dx - 0.025, 0.0125)
-          + ht * (d.dx + 0.00005)
-        )
-      })
-      .innerRadius(function(d) {
-        return Math.sqrt(d.y)
-      })
-      .outerRadius(function(d) {
-        return Math.sqrt(d.y + d.dy * (ht * 0.35 + 0.65)) + ht
-      })
-
-    return function(a) {
-      a.t0 = a.t3 = a.t0 || 0
-      a.t1 = z
-      a.t2 = a.t1 - a.t0
-      return function(_t) {
-        ht = a.t2 * _t + a.t3
-        a.t0 = ht
-        return harc(a)
-      }
-    }
-  }
-
-  //
-  // Makes it possible to rotate
-  // angles greater than 180 degrees :)
-  //
-  function rotateTween(deg) {
-    return function(d) {
-      return function(t) {
-        return 'rotate(' + (1-t) * deg + ')'
-      }
-    }
-  }
 })
+
+function angle(x) {
+  return x
+}
+
+// Modified version of d3's built-in bounce easing method:
+// https://github.com/mbostock/d3/blob/51228ccc4b54789f2d92d268e94716d1c016c774/src/interpolate/ease.js#L105-110
+function bounce_high(t) {
+  return t < 1 / 2.75 ? 7.5625 * t * t
+    : t < 2 / 2.75 ? 7.5625 * (t -= 1.5 / 2.75) * t + .65
+    : t < 2.5 / 2.75 ? 7.5625 * (t -= 2.25 / 2.75) * t + .85
+    : 7.5625 * (t -= 2.625 / 2.75) * t + .975
+}
+
+function arcTween(a) {
+  var i = d3.interpolate({x: a.x0, dx: a.dx0}, a)
+  return function(t) {
+    var b = i(t)
+    a.x0 = b.x
+    a.dx0 = b.dx
+    return arc(b)
+  }
+}
+
+//
+// A more complex arc tween for handling
+// hover states. Returns a tween function
+// which returns an interpolator for each
+// datum.
+//
+function hoverTween(z) {
+  var ht = 0
+  var harc = d3.svg.arc()
+    .startAngle(function(d) {
+      return angle(d.x)
+    })
+    .endAngle(function(d) {
+      return angle(d.x
+        + (1 - ht) * Math.max(d.dx - 0.025, 0.0125)
+        + ht * (d.dx + 0.00005)
+      )
+    })
+    .innerRadius(function(d) {
+      return Math.sqrt(d.y)
+    })
+    .outerRadius(function(d) {
+      return Math.sqrt(d.y + d.dy * (ht * 0.35 + 0.65)) + ht
+    })
+
+  return function(a) {
+    a.t0 = a.t3 = a.t0 || 0
+    a.t1 = z
+    a.t2 = a.t1 - a.t0
+    return function(_t) {
+      ht = a.t2 * _t + a.t3
+      a.t0 = ht
+      return harc(a)
+    }
+  }
+}
+
+//
+// Makes it possible to rotate
+// angles greater than 180 degrees :)
+//
+function rotateTween(deg) {
+  return function(d) {
+    return function(t) {
+      return 'rotate(' + (1-t) * deg + ')'
+    }
+  }
+}
