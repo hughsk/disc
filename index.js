@@ -1,12 +1,20 @@
+var globals = require('insert-module-globals')
 var builtins = require('browser-builtins')
+var mdeps = require('module-deps')
+var sdeps = require('deps-sort')
+var resolve = require('resolve')
+
 var fileTree = require('file-size-tree')
 var quotemeta = require('quotemeta')
 var commondir = require('commondir')
-var mdeps = require('module-deps')
-var sdeps = require('deps-sort')
 var once = require('once')
 var path = require('path')
 var fs = require('fs')
+
+var processPath = submodule(
+    'insert-module-globals'
+  , 'process/browser'
+)
 
 module.exports = {
     json: json
@@ -20,6 +28,7 @@ ignore = new RegExp(ignore, 'i')
 function json(files, transforms, callback) {
   var found = []
     , foundbuiltins = []
+    , virtual = []
 
   files = toarray(files)
   transforms = toarray(transforms)
@@ -33,7 +42,8 @@ function json(files, transforms, callback) {
       }
       return !ignore.test(module)
     }
-  }).pipe(sdeps())
+  }).pipe(globals(files))
+    .pipe(sdeps())
     .once('error', callback)
     .once('close', function() {
       var root = path.basename(commondir(found))
@@ -42,17 +52,32 @@ function json(files, transforms, callback) {
         , children: fileTree(found)
       }
 
-      foundbuiltins.forEach(function(builtin) {
-        tree.children.push({
+      foundbuiltins = foundbuiltins.map(function(builtin) {
+        return {
             name: path.basename(builtin)
           , size: fs.statSync(builtin).size
-        })
+        }
       })
+
+      ;[].push.apply(virtual, foundbuiltins)
+      if (virtual.length) {
+        tree.children.push({
+            name: 'builtins'
+          , children: virtual
+        })
+      }
 
       dirsizes(tree)
       callback(null, tree)
     })
     .on('data', function(dep) {
+      if (dep.id === processPath) {
+        return virtual.push({
+            name: 'process.js'
+          , size: dep.source.length
+        })
+      }
+
       found.push(dep.id)
     })
 }
@@ -118,4 +143,11 @@ function dirsizes(child) {
 function insert(array, value) {
   if (array.indexOf(value) === -1) array.push(value)
   return array
+}
+
+function submodule(parent, child) {
+  parent = require.resolve(parent)
+  return resolve.sync(child, {
+    basedir: path.dirname(parent)
+  })
 }
