@@ -60,10 +60,13 @@ discify index.js --open
 
 ## Module API ##
 
-``` javascript
-var disc = require('disc')
-disc(options, callback)
-```
+### `require('disc').json(files, transforms, callback)` ###
+
+Takes an array of files, and an array of browserify transform streams,
+and gathers the required data - calling `callback(err, json)` with either an
+error or the results.
+
+### `require('disc').bundle(options, callback)` ###
 
 Calls `callback(err, html)` with a standalone HTML file. You can pass the
 following options to the function to modify the output:
