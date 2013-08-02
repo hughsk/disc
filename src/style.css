@@ -124,3 +124,16 @@ pre, code {
    50% { opacity: 0; }
   100% { opacity: 1; }
 }
+
+.palette-wrap {
+  position: absolute;
+  right: 16px;
+}
+
+.palette {
+  width: 48px;
+  overflow:hidden;
+  margin: 4px;
+  cursor: pointer;
+  display: block;
+}
