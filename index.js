@@ -11,6 +11,7 @@ var once = require('once')
 var path = require('path')
 var fs = require('fs')
 
+var bufferPath = require.resolve('insert-module-globals/buffer')
 var processPath = submodule(
     'insert-module-globals'
   , 'process/browser'
@@ -74,6 +75,12 @@ function json(files, transforms, callback) {
       if (dep.id === processPath) {
         return virtual.push({
             name: 'process.js'
+          , size: dep.source.length
+        })
+      } else
+      if (dep.id === bufferPath) {
+        return virtual.push({
+            name: 'buffer.js'
           , size: dep.source.length
         })
       }
