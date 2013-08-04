@@ -30,7 +30,8 @@
     "quotemeta": "0.0.0",
     "browser-builtins": "~1.0.4",
     "insert-module-globals": "~1.2.0",
-    "resolve": "~0.4.1"
+    "resolve": "~0.4.1",
+    "browser-pack": "~0.10.0"
   },
   "devDependencies": {
     "prettysize": "0.0.3",

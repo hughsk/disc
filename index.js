@@ -11,6 +11,7 @@ var once = require('once')
 var path = require('path')
 var fs = require('fs')
 
+var preludeSize = fs.statSync(require.resolve('browser-pack/_prelude')).size
 var bufferPath = require.resolve('insert-module-globals/buffer')
 var processPath = submodule(
     'insert-module-globals'
@@ -52,6 +53,11 @@ function json(files, transforms, callback) {
           name: root
         , children: fileTree(found)
       }
+
+      virtual.push({
+          name: 'prelude.js'
+        , size: preludeSize
+      })
 
       foundbuiltins = foundbuiltins.map(function(builtin) {
         return {
