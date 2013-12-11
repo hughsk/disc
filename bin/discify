@@ -21,6 +21,9 @@ var argv = optimist
   .alias('O', 'open')
   .describe('O', 'Open the file immediately.')
 
+  .alias('n', 'noparse')
+  .describe('n', 'Omit file from parse.')
+
   .argv
 
 var files = argv._ || []
@@ -41,6 +44,7 @@ if (!files.length || argv.help) {
 disc.bundle({
     files: files
   , transform: argv.transform || []
+  , noparse: argv.noparse || []
 }, function(err, html) {
   if (err) throw err
 
