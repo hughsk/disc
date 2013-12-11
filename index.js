@@ -133,7 +133,7 @@ function bundle(opts, callback) {
 }
 
 function toarray(arg) {
-  if (typeof arg === 'undefined') return []
+  if (typeof arg === 'undefined' || arg === null) return []
   return Array.isArray(arg) ? arg : [arg]
 }
 
