@@ -1,4 +1,4 @@
-# disc #
+# disc [![Flattr this](http://api.flattr.com/button/flattr-badge-large.png)](http://flattr.com/thing/1726646/hughskdisc-on-GitHub)[![stable](http://hughsk.github.io/stability-badges/dist/stable.svg)](http://github.com/hughsk/stability-badges) #
 
 [![disc screenshot](http://hughsk.github.io/disc/img/screenshot.png)](http://hughsk.github.io/disc)
 
