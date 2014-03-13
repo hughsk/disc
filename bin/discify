@@ -43,7 +43,7 @@ if (!files.length || argv.help) {
 
 disc.bundle({
     files: files
-  , transform: argv.transform || []
+  , transforms: argv.transform || []
   , noparse: argv.noparse || []
 }, function(err, html) {
   if (err) throw err

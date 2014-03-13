@@ -106,7 +106,7 @@ function bundle(opts, callback) {
 
   var files = toarray(opts.files || null)
   var noparse = toarray(opts.noparse || null)
-  var transforms = toarray(opts.transform || null)
+  var transforms = toarray(opts.transforms || null)
   var footer = opts.footer || ''
   var button = opts.button || ''
 
