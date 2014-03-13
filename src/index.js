@@ -177,7 +177,10 @@ domready(function() {
 
     path.style('fill', function(d) {
       var name = d.children ? d.name : d.parent.name
-      return d.c = schemes[n].modifier.call(d, specials[name] || color(name), root)
+      return d.c = schemes[n].modifier.call(d
+        , specials[name] || color(name)
+        , root
+      )
     })
   }
 

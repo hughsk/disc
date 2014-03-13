@@ -1,3 +1,4 @@
+var extname = require('path').extname
 var d3 = require('d3')
 
 var schemes = []
@@ -31,6 +32,18 @@ var highlights = {
     , '#F7F7F7'
     , '#6C747C'
   ]
+  , modifier: function(color, root) {
+    if (!this.parent) return
+    var p = this
+    if (p) do {
+      // marks out builtin/core modules and their children
+      if (p.name === 'browserify') return '#46AEFE'
+      if (p.name === 'node-browserify') return '#46AEFE'
+      if (p.name === 'insert-module-globals') return '#46AEFE'
+    } while (p = p.parent)
+
+    return color
+  }
 }
 
 var pastel = {
@@ -48,10 +61,31 @@ pastel.main = []
   .concat(pastel.main.map(lighten(2.8)))
   .concat(pastel.main.map(lighten(2)))
 
+var typeScale = d3.scale.ordinal()
+  .range([
+      '#5A5B8F'
+    , '#FFE53D'
+    , '#47F0FF'
+    , '#CD6FF2'
+    , '#EB6E6A'
+    , '#EB9D6A'
+    , '#528AF2'
+  ])
+
+var types = {
+  background: '#160F1F'
+  , specials: {}
+  , main: typeScale.range()
+  , modifier: function(color, root) {
+    return typeScale(extname(this.name))
+  }
+}
+
 schemes.push(
     original
   , highlights
   , pastel
+  , types
 )
 
 function lighten(n) {

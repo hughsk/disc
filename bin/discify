@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 var optimist = require('optimist')
+var map = require('map-async')
+var bl = require('bl')
 var open = require('opener')
 var path = require('path')
 var disc = require('../')
@@ -15,31 +17,46 @@ var argv = optimist
   .alias('o', 'output')
   .describe('o', 'Output path of the bundle. Defaults to stdout.')
 
-  .alias('t', 'transform')
-  .describe('t', 'Browserify transform stream(s) to use.')
-
   .alias('O', 'open')
   .describe('O', 'Open the file immediately.')
 
-  .alias('n', 'noparse')
-  .describe('n', 'Omit file from parse.')
-
   .argv
+
+if (argv.help) {
+  optimist.showHelp()
+  return process.exit(1)
+}
 
 var files = argv._ || []
 
 files = Array.isArray(files)
-  ?  files
-  : [files]
+  ? files
+  : files ? [files] : []
 
-files = files.map(function(name) {
-  return path.resolve(name)
-})
-
-if (!files.length || argv.help) {
-  optimist.showHelp()
-  process.exit(1)
+if (!files.length) {
+  process.stdin.resume()
+  process.stdin.pipe(bl(function(err, data) {
+    if (err) throw err
+    handle([data])
+  }))
+} else {
+  map(files, function(file, next) {
+    fs.readFile(path.resolve(file), next)
+  }, function(err, files) {
+    handle(files)
+  })
 }
+
+function handle(files) {
+  disc.bundle(files, function(err, html) {
+    if (err) throw err
+    if (argv.open) return host(html)
+    if (argv.output) return fs.writeFileSync(argv.output, html)
+    console.log(html)
+  })
+}
+
+return
 
 disc.bundle({
     files: files
