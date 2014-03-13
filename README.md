@@ -24,14 +24,14 @@ sudo npm install -g disc
 
 ## Command-Line Interface ##
 
-``` bash
+```
 discify [file(s)...] {options}
 
 Options:
   -h, --help       Displays these instructions.
   -o, --output     Output path of the bundle. Defaults to stdout.
   -t, --transform  Browserify transform stream(s) to use.
-  --extension      Consider files with specified EXTENSION as modules, this option can used multiple times.
+  -x, --extension  Consider files with the specified extension as modules.
   -O, --open       Open the file immediately.
   -n, --noparse    Omit file from parse.
 ```
