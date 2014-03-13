@@ -27,13 +27,14 @@ var ignore = Object.keys(builtins).concat(['os', 'module', 'cluster'])
 ignore = '^(?:' + ignore.join('|') + ')$'
 ignore = new RegExp(ignore, 'i')
 
-function json(files, transforms, noparse, callback) {
+function json(files, transforms, extensions, noparse, callback) {
   var found = []
     , foundbuiltins = []
     , virtual = []
 
   files = toarray(files)
   transforms = toarray(transforms)
+  extensions = toarray(extensions)
   noparse = toarray(noparse)
   callback = once(callback)
 
@@ -43,6 +44,7 @@ function json(files, transforms, noparse, callback) {
 
   mdeps(files, {
       transform: transforms
+    , extensions: [".js", ".json"].concat(extensions)
     , noParse: noparse
     , filter: function(module) {
       if (builtins[module]) {
@@ -106,11 +108,12 @@ function bundle(opts, callback) {
 
   var files = toarray(opts.files || null)
   var noparse = toarray(opts.noparse || null)
-  var transforms = toarray(opts.transform || null)
+  var transforms = toarray(opts.transforms || null)
+  var extensions = toarray(opts.extensions || null)
   var footer = opts.footer || ''
   var button = opts.button || ''
 
-  json(files, transforms, noparse, function(err, data) {
+  json(files, transforms, extensions, noparse, function(err, data) {
     if (err) return callback(err)
 
     data = '<script type="text/javascript">'

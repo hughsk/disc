@@ -18,6 +18,8 @@ var argv = optimist
   .alias('t', 'transform')
   .describe('t', 'Browserify transform stream(s) to use.')
 
+  .describe('extension', 'Consider files with specified EXTENSION as modules, this option can used multiple times.')
+
   .alias('O', 'open')
   .describe('O', 'Open the file immediately.')
 
@@ -43,7 +45,8 @@ if (!files.length || argv.help) {
 
 disc.bundle({
     files: files
-  , transform: argv.transform || []
+  , transforms: argv.transform || []
+  , extensions: argv.extension || []
   , noparse: argv.noparse || []
 }, function(err, html) {
   if (err) throw err
