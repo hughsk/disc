@@ -31,7 +31,9 @@ Options:
   -h, --help       Displays these instructions.
   -o, --output     Output path of the bundle. Defaults to stdout.
   -t, --transform  Browserify transform stream(s) to use.
+  --extension      Consider files with specified EXTENSION as modules, this option can used multiple times.
   -O, --open       Open the file immediately.
+  -n, --noparse    Omit file from parse.
 ```
 
 Simply specify your script entry points as you would when building a project
@@ -60,7 +62,7 @@ discify index.js --open
 
 ## Module API ##
 
-### `require('disc').json(files, transforms, callback)` ###
+### `require('disc').json(files, transforms, extensions, callback)` ###
 
 Takes an array of files, and an array of browserify transform streams,
 and gathers the required data - calling `callback(err, json)` with either an
@@ -74,4 +76,6 @@ following options to the function to modify the output:
 * `files`: the files to parse/traverse
 * `footer`: HTML to include below the chart.
 * `transforms`: transform streams to pass to
+  [module-deps](http://ghub.io/module-deps).
+* `extensions`: extensions to pass to
   [module-deps](http://ghub.io/module-deps).
