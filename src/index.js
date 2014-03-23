@@ -28,11 +28,19 @@ domready(function() {
     .append('g')
       .attr('transform', 'translate(' + width / 2 + ',' + height * .52 + ')')
 
-  var palettes = d3.select('.palette-wrap')
+  var paletteDiv = d3.select('.palette-wrap')
     .style('top', String(window.innerHeight - (schemes.length - 1) * 56 - 16) + 'px')
     .selectAll('.palette')
     .data(schemes)
     .enter()
+    .append('div')
+    .classed('scheme-icon', true)
+
+  paletteDiv.append('span')
+    .classed('scheme-text', true)
+    .text(function(d) { return d.name })
+
+  var palettes = paletteDiv
     .append('svg')
     .style('display', 'inline-block')
     .classed('palette', true)
@@ -148,6 +156,13 @@ domready(function() {
     background = schemes[n].background
     specials = schemes[n].specials
 
+    palettes.each(function(d, i) {
+      d3.select(this.parentNode)
+        .classed('selected', function() {
+          return i === n
+        })
+    })
+
     palettes
       .transition()
       .ease('bounce')
@@ -177,7 +192,11 @@ domready(function() {
 
     path.style('fill', function(d) {
       var name = d.children ? d.name : d.parent.name
-      return d.c = schemes[n].modifier.call(d, specials[name] || color(name), root)
+      d.c = schemes[n].modifier.call(d
+        , specials[name] || color(name)
+        , root
+      )
+      return d.c
     })
   }
 

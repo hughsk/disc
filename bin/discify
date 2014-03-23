@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 
 var optimist = require('optimist')
-var open = require('opener')
+var map = require('map-async')
 var path = require('path')
 var disc = require('../')
 var fs = require('fs')
+var bl = require('bl')
 
 var argv = optimist
-  .usage('$0 [file(s)...] {options}')
+  .usage('$0 [bundle(s)...] {options}')
 
   .alias('h', 'help')
   .describe('h', 'Displays these instructions.')
@@ -15,59 +16,37 @@ var argv = optimist
   .alias('o', 'output')
   .describe('o', 'Output path of the bundle. Defaults to stdout.')
 
-  .alias('t', 'transform')
-  .describe('t', 'Browserify transform stream(s) to use.')
-
-  .alias('x', 'extension')
-  .describe('x', 'Consider files with the specified extension as modules.')
-
-  .alias('O', 'open')
-  .describe('O', 'Open the file immediately.')
-
-  .alias('n', 'noparse')
-  .describe('n', 'Omit file from parse.')
-
   .argv
+
+if (argv.help) {
+  optimist.showHelp()
+  return process.exit(1)
+}
 
 var files = argv._ || []
 
 files = Array.isArray(files)
-  ?  files
-  : [files]
+  ? files
+  : files ? [files] : []
 
-files = files.map(function(name) {
-  return path.resolve(name)
-})
-
-if (!files.length || argv.help) {
-  optimist.showHelp()
-  process.exit(1)
+if (!files.length) {
+  process.stdin.resume()
+  process.stdin.pipe(bl(function(err, data) {
+    if (err) throw err
+    handle([data])
+  }))
+} else {
+  map(files, function(file, next) {
+    fs.readFile(path.resolve(file), next)
+  }, function(err, files) {
+    handle(files)
+  })
 }
 
-disc.bundle({
-    files: files
-  , noparse: argv.noparse || []
-  , extensions: argv.extension || []
-  , transforms: []
-    .concat(argv.transforms || [])
-    .concat(argv.transform || [])
-}, function(err, html) {
-  if (err) throw err
-
-  if (argv.open) return host(html)
-
-  if (argv.output) {
-    fs.writeFileSync(argv.output, html)
-  } else {
+function handle(bundles) {
+  disc.bundle(bundles, function(err, html) {
+    if (err) throw err
+    if (argv.output) return fs.writeFileSync(argv.output, html)
     console.log(html)
-  }
-})
-
-function host(html) {
-  return require('http').createServer(function(req, res) {
-    res.end(html)
-  }).listen(9977, function() {
-    console.error('Listening on http://localhost:9977')
-    open('http://localhost:9977')
   })
 }
