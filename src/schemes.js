@@ -1,9 +1,11 @@
+var extname = require('path').extname
 var d3 = require('d3')
 
 var schemes = []
 
 var original = {
-    background: '#6A4A3C'
+    name: 'Original'
+  , background: '#6A4A3C'
   , specials: {
     node_modules: '#FF8553'
   }
@@ -21,7 +23,8 @@ original.main = []
   .concat(original.main.map(lighten(2.0)))
 
 var highlights = {
-  background: '#1A1C1E'
+    name: 'Structure Highlights'
+  , background: '#1A1C1E'
   , specials: {
       node_modules: '#E1F200'
     , lib: '#FF9D3C'
@@ -34,7 +37,8 @@ var highlights = {
 }
 
 var pastel = {
-  background: '#362F34'
+    name: 'Pastel'
+  , background: '#362F34'
   , specials: {}
   , main: [
       '#D05931'
@@ -48,10 +52,54 @@ pastel.main = []
   .concat(pastel.main.map(lighten(2.8)))
   .concat(pastel.main.map(lighten(2)))
 
+var typeScale = d3.scale.ordinal()
+  .range([
+      '#5A5B8F'
+    , '#FFE53D'
+    , '#47F0FF'
+    , '#CD6FF2'
+    , '#EB6E6A'
+    , '#EB9D6A'
+    , '#528AF2'
+  ])
+
+var types = {
+    name: 'File Types'
+  , background: '#160F1F'
+  , specials: {}
+  , main: typeScale.range()
+  , modifier: function(color, root) {
+    return typeScale(extname(this.name))
+  }
+}
+
+var core = {
+    name: 'Browserify Core'
+  , background: '#24131D'
+  , specials: {}
+  , main: [
+    '#FBBF60',
+    '#CE3F46'
+  ]
+  , modifier: function(color, root) {
+    var curr = this
+
+    do {
+      if (curr.name === 'browserify-core') {
+        return core.main[1]
+      }
+    } while (curr = curr.parent)
+
+    return core.main[0]
+  }
+}
+
 schemes.push(
     original
   , highlights
   , pastel
+  , types
+  , core
 )
 
 function lighten(n) {

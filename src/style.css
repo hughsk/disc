@@ -9,6 +9,11 @@ html, body {
   animation: background 2s;
 }
 
+body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
 .content {
   animation: content 4s;
 }
@@ -46,6 +51,14 @@ h2 {
 
 .chart {
   margin: 0 auto;
+}
+
+.chart,
+.modes,
+.palette-wrap {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
 }
 
 .markdown {
@@ -108,6 +121,33 @@ h2 {
 .scale-size  { background-image: inline(icon-size.png); }
 .scale-count { background-image: inline(icon-count.png); }
 
+.scheme-icon.selected .scheme-text {
+  display: none;
+}
+
+.scheme-icon .scheme-text {
+  opacity: 0;
+  right: -50px;
+  transition: opacity 0.2s, right 0.2s;
+}
+
+.scheme-icon .palette     { z-index: 99; }
+.scheme-icon .scheme-text { z-index: 90; }
+
+.scheme-icon:hover .scheme-text {
+  opacity: 1;
+  right: 64px;
+}
+
+.scheme-text {
+  cursor: pointer;
+  position: absolute;
+  width: 150px;
+  height: 48px;
+  line-height: 48px;
+  text-align: right;
+}
+
 pre, code {
   font-family: 'Source Code Pro', 'Courier New', monospace;
   font-size: 14px;
@@ -135,5 +175,6 @@ pre, code {
   overflow:hidden;
   margin: 4px;
   cursor: pointer;
+  position: relative;
   display: block;
 }
