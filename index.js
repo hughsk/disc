@@ -1,21 +1,40 @@
 var unpack = require('browser-unpack')
+var builtins = require('builtins')
+var through = require('through')
 var resolve = require('resolve')
 var flatten = require('flatten')
-var pluck = require('pluck')
+var duplex = require('duplexer')
+var pluck = require('plucker')
 var uniq = require('uniq')
 
 var commondir = require('commondir')
 var fileTree = require('file-tree')
 var path = require('path')
 var fs = require('fs')
+var bl = require('bl')
 
-var preludeSize = fs.statSync(
-  require.resolve('browser-pack/_prelude')
-).size
+module.exports = createStream
+createStream.json = json
+createStream.bundle = bundle
 
-module.exports = {
-    json: json
-  , bundle: bundle
+function createStream(opts) {
+  opts = opts || {}
+
+  var buffer = bl(function(err, content) {
+    if (err) return stream.emit('error', err)
+
+    bundle(content, opts, function(err, html) {
+      if (err) return stream.emit('error', err)
+
+      output.queue(html)
+      output.queue(null)
+    })
+  })
+
+  var output = through()
+  var stream = duplex(buffer, output)
+
+  return stream
 }
 
 function json(bundles, callback) {
@@ -23,18 +42,33 @@ function json(bundles, callback) {
     .map(String)
     .map(unpack)
   ).map(function(module) {
+    if (typeof module === 'undefined') return callback(new Error(
+      'Unable to compile one of the supplied bundles!'
+    ))
+
     if (typeof module.id !== 'number') return module
-    throw new Error(
-      'please compile this browserify bundle using the --full-paths flag'
-    )
+
+    return callback(new Error(
+      'Please recompile this browserify bundle using the --full-paths flag ' +
+      '(when using the command-line interface) or with the fullPaths option ' +
+      'set to true (when using the JavaScript API).'
+    ))
+  })
+
+  modules = modules.filter(function(module) {
+    return !isEmpty(module)
   })
 
   var browserifyModules = modules.filter(fromBrowserify(true))
-  var otherModules = modules.filter(fromBrowserify(false))
+  var otherModules = modules.filter(function(module) {
+    if (path.basename(module.id) === '_empty.js') return false
+    if (browserifyModules.indexOf(module) === -1) return true
+  })
+
   var root = commondir(otherModules.map(pluck('id')))
 
   browserifyModules.forEach(function(module) {
-    var regex = /^.+\/node_modules\/browserify\/(.+)$/g
+    var regex = /^.+\/node_modules\/browserify\/(?:node_modules\/)(.+)$/g
 
     module.id = module.id.replace(regex, function(_, subpath) {
       return path.resolve(root, 'browserify-core/' + subpath)
@@ -84,8 +118,8 @@ function bundle(bundles, opts, callback) {
   opts = opts || {}
   callback = callback || noop
 
+  var header = opts.header || opts.button || ''
   var footer = opts.footer || ''
-  var button = opts.button || ''
 
   return json(bundles, function(err, data) {
     if (err) return callback(err)
@@ -103,7 +137,7 @@ function bundle(bundles, opts, callback) {
         scripts: script
       , styles: styles()
       , markdown: footer
-      , button: button
+      , header: header
       , data: data
     }))
   })
@@ -156,11 +190,72 @@ function sortById(a, b) {
 function noop(){}
 
 function fromBrowserify(yes) {
-  return function(module) {
-    var idx = module.id.indexOf('/node_modules/browserify')
+  var existsCache = {}
+  var no = !yes
 
-    return idx !== -1
-      ?  yes
-      : !yes
+  return function(module) {
+    var search = '/node_modules/browserify'
+    var idx  = module.id.indexOf(search)
+    var from = idx !== -1
+
+    if (!from) return no
+
+    // special case for process.js
+    // from insert-module-globals
+    if (
+      module.id.indexOf('insert-module-globals') !== -1 &&
+      module.id.split(path.sep).slice(-2).join('/') === 'process/browser.js'
+    ) return yes
+
+    // Look up browserify's builtins file to
+    // determine if this file is part of browserify
+    // core.
+    var builtinFile = (
+      module.id.slice(0, idx + search.length) +
+      '/lib/builtins.js'
+    )
+
+    if (!(builtinFile in existsCache)) {
+      existsCache[builtinFile] = values(
+        fs.existsSync(builtinFile) &&
+        require(builtinFile) || {}
+      )
+    }
+
+    var localBuiltins = existsCache[builtinFile]
+    var bidx = localBuiltins.indexOf(module.id)
+
+    if (bidx !== -1) return yes
+
+    // Guess remaining helper files based on module
+    // name: this should probably be improved in the
+    // future.
+    var split = module.id.split(path.sep)
+    var j = split.length - 1
+
+    while (split[--j] !== 'node_modules');;
+
+    var dir = split.slice(j + 1)[0].replace(/\-(?:browser(?:ify)?|es3)$/g, '')
+    if (dir === 'Base64') return yes
+    if (dir === 'base64-js') return yes
+    if (dir === 'inherits') return yes
+    if (dir === 'process') return yes
+    if (dir === 'ieee754') return yes
+    if (builtins.indexOf(dir) !== -1) return yes
+
+    return no
   }
+}
+
+function values(object) {
+  return Object.keys(object).map(function(key) {
+    return object[key]
+  })
+}
+
+function isEmpty(module) {
+  return (
+    path.basename(module.id) === '_empty.js' &&
+  (!fs.existsSync(module.id) || !fs.statSync(module.id).size)
+  )
 }

@@ -1,15 +1,12 @@
-# disc [![Flattr this](http://api.flattr.com/button/flattr-badge-large.png)](http://flattr.com/thing/1726646/hughskdisc-on-GitHub)[![stable](http://hughsk.github.io/stability-badges/dist/stable.svg)](http://github.com/hughsk/stability-badges) #
-
-[![disc screenshot](http://hughsk.github.io/disc/img/screenshot.png)](http://hughsk.github.io/disc)
+# disc ![gittip: hughsk](http://img.shields.io/gittip/hughsk.svg) ![npm](http://img.shields.io/npm/dm/disc.svg)  ![stable](http://img.shields.io/badge/stability-stable-green.svg) #
 
 Disc is a tool for analyzing the module tree of
 [browserify](http://browserify.org) project bundles. It's especially handy
 for catching large and/or duplicate modules which might be either bloating up
-your bundle or slowing down the build process. It works with node projects too!
+your bundle or slowing down the build process.
 
 The demo included on disc's [github page](http://hughsk.github.io/disc)
-is the end result of running the tool on itself - displaying both the node
-and browser code.
+is the end result of running the tool on browserify's own code base.
 
 ## Installation ##
 
@@ -24,54 +21,123 @@ sudo npm install -g disc
 
 ## Command-Line Interface ##
 
+***Note:*** *you'll need to build your bundle with the `--full-paths` flag
+for disc to do its thing.*
+
 ``` bash
-discify [file(s)...] {options}
+discify [bundle(s)...] {options}
 
 Options:
   -h, --help       Displays these instructions.
   -o, --output     Output path of the bundle. Defaults to stdout.
-  -t, --transform  Browserify transform stream(s) to use.
-  -O, --open       Open the file immediately.
 ```
 
-Simply specify your script entry points as you would when building a project
-with the `browserify` command-line tool - if your project uses source
-transforms, you should include those too, e.g:
+When you install disc globally, you the `discify` command-line tool is made
+available as the quickest means of checking out your bundle. As of disc v1.0.0,
+this tool takes any bundled browserify script as input and spits out a
+standalone HTML page as output.
+
+For example:
 
 ``` bash
-discify -t coffeeify index.coffee
+browserify --full-paths index.js > bundle.js
+discify bundle.js > disc.html
+open disc.html
 ```
 
-By default, disc will spit out a standalone HTML file that you can open
-in your browser:
+This is pipeable too, so you could push the result to
+[bcat](https://github.com/kessler/node-bcat) and open it in your browser
+straight away:
 
 ``` bash
-discify index.js > stats.html
-open stats.html
-```
-
-If you're looking to get a quick look at your project, you can use the `--open`
-or `-O` flags to start a local server and open it up in your browser
-automatically:
-
-``` bash
-discify index.js --open
+browserify --full-paths index.js | discify | bcat
 ```
 
 ## Module API ##
 
-### `require('disc').json(files, transforms, callback)` ###
+***Note:*** *you'll need to build your bundle with the `fullPaths` option
+for disc to do its thing.*
 
-Takes an array of files, and an array of browserify transform streams,
-and gathers the required data - calling `callback(err, json)` with either an
-error or the results.
+### `require('disc')(opts)` ###
 
-### `require('disc').bundle(options, callback)` ###
+Creates a through stream that you can pipe a bundle into, and get an HTML file
+in return – much like you would expect when working with the command-line tool.
 
-Calls `callback(err, html)` with a standalone HTML file. You can pass the
-following options to the function to modify the output:
+So to perform the above example with Node instead of Bash:
 
-* `files`: the files to parse/traverse
-* `footer`: HTML to include below the chart.
-* `transforms`: transform streams to pass to
-  [module-deps](http://ghub.io/module-deps).
+``` javascript
+var browserify = require('browserify')
+var open = require('opener')
+var disc = require('disc')
+var fs = require('fs')
+
+var input = __dirname + '/index.js'
+var output = __dirname + '/disc.html'
+
+var bundler = browserify(input, {
+  fullPaths: true
+})
+
+bundler.bundle()
+  .pipe(disc())
+  .pipe(fs.createWriteStream(output))
+  .once('close', function() {
+    open(output)
+  })
+```
+
+This method takes the following options:
+
+* `header`: HTML to include above the visualisation. Used internally to render
+  the "Fork me on GitHub" ribbon.
+* `footer`: HTML to include beneath the visualisation. Used internally for the
+  description on the demo page.
+
+### `disc.bundle(bundles, [opts], callback)` ###
+
+A callback-style interface for disc: takes an array of `bundles` (note: the
+file contents and not the file names), calling `callback(err, html)` with
+either an error or the resulting standalone HTML file as arguments.
+
+This currently mirrors how disc is currently implemented, but the stream API is
+a little more convenient to work with.
+
+### `disc.json(bundles, callback)` ###
+
+Takes an array of bundle contents (as strings, or Buffers), and gathers the
+required data - calling `callback(err, json)` with either an error or the
+results.
+
+## Palettes ##
+
+You can switch between multiple color palettes, most of which serve to highlight
+specific features of your bundle:
+
+### Structure Highlights ###
+
+![Structure Highlights](http://i.imgur.com/LO6Gio3.png)
+
+Highlights `node_modules` directories as green and `lib` directories as orange.
+This makes it easier to scan for "kitchen sink" modules or modules with lots of
+dependencies.
+
+### File Types ###
+
+![File Types](http://i.imgur.com/A8zDrbN.png)
+
+Highlights each file type (e.g. `.js`, `.css`, etc.) a different color. Helpful
+for tracking down code generated from a transform that's bloating up your bundle
+more than expected.
+
+### Browserify Core ###
+
+![Browserify Core](http://i.imgur.com/AtiKgwR.png)
+
+Highlights the automatically included and/or inserted modules that come courtesy
+of browserify in red. Makes it easy to quantify just how much space in your
+bundle is the result of shimming node's core functionality.
+
+### Original/Pastel ###
+
+Nothing particularly special about these palettes – colored for legibility and
+aesthetics respectively.
