@@ -50,7 +50,7 @@ This is pipeable too, so you could push the result to
 straight away:
 
 ``` bash
-browserify --full-paths index.js | discify | bcat
+browserify --full-paths index.js | discify | bcat -h
 ```
 
 ## Module API ##
