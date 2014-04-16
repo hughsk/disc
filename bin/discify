@@ -2,7 +2,9 @@
 
 var optimist = require('optimist')
 var map = require('map-async')
+var open = require('opener')
 var path = require('path')
+var http = require('http')
 var disc = require('../')
 var fs = require('fs')
 var bl = require('bl')
@@ -16,6 +18,9 @@ var argv = optimist
 
   .alias('o', 'output')
   .describe('o', 'Output path of the bundle. Defaults to stdout.')
+
+  .alias('O', 'open')
+  .describe('O', 'Opens disc in a new browser window automatically')
 
   .alias('m', 'mode')
   .describe('m', 'the default file scale mode to display: should be either "count" or "size". Default: size')
@@ -53,6 +58,29 @@ function handle(bundles) {
   }, function(err, html) {
     if (err) throw err
     if (argv.output) return fs.writeFileSync(argv.output, html)
-    console.log(html)
+    if (!argv.open) return console.log(html)
+
+    // Create a temporary HTTP server, serve up
+    // the index.html page and then close the
+    // process ASAP
+    var server = http.createServer()
+
+    server.on('request', function(req, res) {
+      if (req.url === '/favicon.ico') {
+        return res.end('missing') // PRs welcome :)
+      }
+
+      res.once('finish', function() {
+        setTimeout(function() {
+          process.exit()
+        }, 500)
+      })
+
+      res.setHeader('content-type', 'text/html')
+      res.end(html)
+    }).listen(12999, function(err) {
+      if (err) throw err
+      open('http://localhost:12999/')
+    })
   })
 }

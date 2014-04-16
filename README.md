@@ -30,6 +30,7 @@ discify [bundle(s)...] {options}
 Options:
   -h, --help    Displays these instructions.
   -o, --output  Output path of the bundle. Defaults to stdout.
+  -O, --open    Opens disc in a new browser window automatically
   -m, --mode    the default file scale mode to display: should be
                 either "count" or "size". Default: size
 ```
@@ -47,12 +48,11 @@ discify bundle.js > disc.html
 open disc.html
 ```
 
-This is pipeable too, so you could push the result to
-[bcat](https://github.com/kessler/node-bcat) and open it in your browser
-straight away:
+You can easily chain this file into another command, or use the `--open`
+flag to open disc in your browser automatically:
 
 ``` bash
-browserify --full-paths index.js | discify | bcat -h
+browserify --full-paths index.js | discify --open
 ```
 
 ## Module API ##
