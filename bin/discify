@@ -8,6 +8,7 @@ var fs = require('fs')
 var bl = require('bl')
 
 var argv = optimist
+  .wrap(70)
   .usage('$0 [bundle(s)...] {options}')
 
   .alias('h', 'help')
@@ -15,6 +16,9 @@ var argv = optimist
 
   .alias('o', 'output')
   .describe('o', 'Output path of the bundle. Defaults to stdout.')
+
+  .alias('m', 'mode')
+  .describe('m', 'the default file scale mode to display: should be either "count" or "size". Default: size')
 
   .argv
 
@@ -44,7 +48,9 @@ if (!files.length) {
 }
 
 function handle(bundles) {
-  disc.bundle(bundles, function(err, html) {
+  disc.bundle(bundles, {
+    mode: argv.mode
+  }, function(err, html) {
     if (err) throw err
     if (argv.output) return fs.writeFileSync(argv.output, html)
     console.log(html)

@@ -15,6 +15,12 @@ var initArc = d3.svg.arc()
   .innerRadius(function(d) { return Math.sqrt(d.y) })
   .outerRadius(function(d) { return Math.sqrt(d.y) })
 
+var modeInitial = window.disc.mode || 'size'
+var modeFns = {
+    count: function() { return 1 }
+  , size: function(d) { return d.size }
+}
+
 domready(function() {
   var root = window.disc
     , width = window.innerWidth
@@ -78,7 +84,7 @@ domready(function() {
   var partition = d3.layout.partition()
       .sort(null)
       .size([2 * Math.PI, radius * radius])
-      .value(function(d) { return 1 })
+      .value(modeFns[modeInitial])
 
   //
   // Creates the title text in
@@ -263,20 +269,24 @@ domready(function() {
   }
 
   var modes = d3.selectAll('[data-mode]')
-  modes.on('click', function change() {
-    var value
-    switch (this.getAttribute('data-mode')) {
-      case 'count':
-      default:
-        value = function() { return 1 }
-        break
-      case 'size':
-        value = function(d) { return d.size }
-        break
-    }
 
-    modes.style('opacity', null)
-    d3.select(this).style('opacity', 1)
+  updateMode(modeInitial)
+  modes.on('click', function() {
+    updateMode(
+      this.getAttribute('data-mode')
+    , true)
+  })
+
+  function updateMode(mode, update) {
+    value = modeFns[mode] || value
+
+    modes.style('opacity', function(d) {
+      return mode === (
+        this.mode = this.mode || this.getAttribute('data-mode')
+      ) ? 1 : null
+    })
+
+    if (!update) return
 
     groups
         .data(partition.value(value).nodes)
@@ -284,7 +294,7 @@ domready(function() {
       .transition()
         .duration(1500)
         .attrTween('d', arcTween)
-  })
+  }
 })
 
 function angle(x) {

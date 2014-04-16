@@ -124,6 +124,7 @@ function bundle(bundles, opts, callback) {
   return json(bundles, function(err, data) {
     if (err) return callback(err)
 
+    data.mode = opts.mode || 'size'
     data = '<script type="text/javascript">'
       + ';window.disc = ('
       + JSON.stringify(data)

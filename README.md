@@ -28,8 +28,10 @@ for disc to do its thing.*
 discify [bundle(s)...] {options}
 
 Options:
-  -h, --help       Displays these instructions.
-  -o, --output     Output path of the bundle. Defaults to stdout.
+  -h, --help    Displays these instructions.
+  -o, --output  Output path of the bundle. Defaults to stdout.
+  -m, --mode    the default file scale mode to display: should be
+                either "count" or "size". Default: size
 ```
 
 When you install disc globally, you the `discify` command-line tool is made
@@ -92,6 +94,8 @@ This method takes the following options:
   the "Fork me on GitHub" ribbon.
 * `footer`: HTML to include beneath the visualisation. Used internally for the
   description on the demo page.
+* `mode`: the default file scale mode to display: one of either `"count"` or
+  `"size"`, defaulting to `"size"`.
 
 ### `disc.bundle(bundles, [opts], callback)` ###
 
