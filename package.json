@@ -1,6 +1,6 @@
 {
   "name": "disc",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A tool for analyzing the module tree of a browserify bundle or node project",
   "main": "index.js",
   "scripts": {
