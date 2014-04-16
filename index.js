@@ -13,6 +13,8 @@ var path = require('path')
 var fs = require('fs')
 var bl = require('bl')
 
+var versions = require('./lib/versions')
+
 module.exports = createStream
 createStream.json = json
 createStream.bundle = bundle
@@ -95,12 +97,14 @@ function json(bundles, callback) {
     next(null, {
         size: row.source.length
       , deps: Object.keys(row.deps).length
+      , path: id
     })
   }, function(err, tree) {
     if (err) return callback(err)
 
     tree = { name: main, children: tree }
     dirsizes(tree)
+    versions(tree)
     callback(null, tree)
   })
 }
