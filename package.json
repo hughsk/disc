@@ -28,7 +28,7 @@
     "plucker": "0.0.0",
     "flatten": "0.0.1",
     "commondir": "0.0.1",
-    "uniq": "0.0.2",
+    "uniq": "^1.0.0",
     "resolve": "^0.6.2",
     "map-async": "^0.1.1",
     "file-tree": "0.0.0",
