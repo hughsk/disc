@@ -21,7 +21,7 @@
   "license": "MIT",
   "readmeFilename": "README.md",
   "dependencies": {
-    "browser-unpack": "git://github.com/hughsk/browser-unpack#empty-fix",
+    "browser-unpack": "^0.2.3",
     "d3": "^3.4.3",
     "optimist": "^0.6.1",
     "bl": "^0.7.0",
