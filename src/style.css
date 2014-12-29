@@ -96,17 +96,21 @@ h2 {
   opacity: 1;
 }
 .scale-icon {
-  background-position: right center;
   height: 48px;
   line-height: 48px;
   margin-bottom: 12px;
   cursor: pointer;
-  padding-right: 64px;
   font-size: 1.2em;
   text-align: right;
-  background-repeat: no-repeat;
   opacity: 0.5;
+  padding-right:64px;
   transition: opacity 0.2s;
+  position:relative;
+}
+.scale-icon svg {
+  position:absolute;
+  top:0;
+  right:0;
 }
 .scale-icon:hover span {
   opacity: 1;
@@ -118,8 +122,6 @@ h2 {
   opacity: 0;
   transition: opacity 0.2s, left 0.2s;
 }
-.scale-size  { background-image: inline(icon-size.png); }
-.scale-count { background-image: inline(icon-count.png); }
 
 .scheme-icon.selected .scheme-text {
   display: none;
