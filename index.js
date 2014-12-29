@@ -57,8 +57,10 @@ function json(bundles, callback) {
   })
 
   modules = modules.filter(function(module) {
-    return !isEmpty(module)
+    return module && !isEmpty(module)
   })
+
+  if (!modules.length) return
 
   var browserifyModules = modules.filter(fromBrowserify(true))
   var otherModules = modules.filter(function(module) {
