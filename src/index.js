@@ -297,7 +297,7 @@ domready(function() {
         .enter()
         .append('circle').attr('fill', '#fff')
         .attr('r', function(d, i) {
-          return type === 'size' ? 3 : (i === 0 || i === 6) ? 6 : 3
+          return type !== 'size' ? 3 : (i === 0 || i === 6) ? 6 : 3
         })
         .attr('transform', function(d) {
           return 'translate(' + [(d % 4) * 10, Math.floor(d / 4) * 10] + ')'
