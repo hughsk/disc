@@ -9,7 +9,8 @@
     "bundle-demo": "node lib/bundle-demo > index.html",
     "build-fixture": "browserify --full-paths ./test/fixture/index.js > ./test/fixture/bundle.js && browserify ./test/fixture/index.js > ./test/fixture/bundle-no-full.js",
     "demo": "npm run prepublish && opener index.html",
-    "rework": "node lib/bundle-css > build/style.css"
+    "rework": "node lib/bundle-css > build/style.css",
+    "test": "node test | tap-spec"
   },
   "repository": {
     "type": "git",
@@ -46,6 +47,7 @@
     "marked": "^0.3.2",
     "prettysize": "0.0.3",
     "rework": "^0.20.2",
+    "tap-spec": "^2.1.2",
     "tape": "^3.0.3",
     "uglify-js": "^2.4.15"
   },
