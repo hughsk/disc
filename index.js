@@ -1,7 +1,6 @@
 var unpack = require('browser-unpack')
 var builtins = require('builtins')
 var through = require('through')
-var resolve = require('resolve')
 var flatten = require('flatten')
 var duplex = require('duplexer')
 var pluck = require('plucker')
@@ -148,11 +147,6 @@ function bundle(bundles, opts, callback) {
   })
 }
 
-function toarray(arg) {
-  if (typeof arg === 'undefined' || arg === null) return []
-  return Array.isArray(arg) ? arg : [arg]
-}
-
 function template() {
   if (template.text) return template.text
   return template.text = require('./lib/lazy-template')(
@@ -174,22 +168,6 @@ function dirsizes(child) {
   return child.size = "size" in child ? child.size : child.children.reduce(function(size, child) {
     return size + ("size" in child ? child.size : dirsizes(child))
   }, 0)
-}
-
-function submodule(parent, child) {
-  parent = require.resolve(parent)
-  return resolve.sync(child, {
-    basedir: path.dirname(parent)
-  })
-}
-
-function sortById(a, b) {
-  var aid = a.id
-  var bid = b.id
-
-  return aid > bid
-    ? -1 : aid < bid
-    ? +1 : 0
 }
 
 function noop(){}
