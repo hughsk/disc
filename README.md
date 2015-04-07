@@ -21,7 +21,8 @@ sudo npm install -g disc
 
 ## Command-Line Interface ##
 
-***Note:*** *you'll need to build your bundle with the `--full-paths` flag
+***Note:*** *you'll need to build your bundle with the `--full-paths` flag, 
+and pass a fully qualified (not relative) input path to browserify
 for disc to do its thing.*
 
 ``` bash
