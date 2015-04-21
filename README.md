@@ -21,7 +21,7 @@ sudo npm install -g disc
 
 ## Command-Line Interface ##
 
-***Note:*** *you'll need to build your bundle with the `--full-paths` flag, 
+***Note:*** *you'll need to build your bundle with the `--full-paths` flag,
 and pass a fully qualified (not relative) input path to browserify
 for disc to do its thing.*
 
@@ -29,11 +29,12 @@ for disc to do its thing.*
 discify [bundle(s)...] {options}
 
 Options:
-  -h, --help    Displays these instructions.
-  -o, --output  Output path of the bundle. Defaults to stdout.
-  -O, --open    Opens disc in a new browser window automatically
-  -m, --mode    the default file scale mode to display: should be
-                either "count" or "size". Default: size
+  -h, --help       Displays these instructions.
+  -o, --output     Output path of the bundle. Defaults to stdout.
+  -O, --open       Opens disc in a new browser window automatically
+  -m, --mode       the default file scale mode to display: should be
+                   either "count" or "size". Default: size
+  -r, --no-rotate  Turns off rotate animation
 ```
 
 When you install disc globally, you the `discify` command-line tool is made
@@ -97,6 +98,8 @@ This method takes the following options:
   description on the demo page.
 * `mode`: the default file scale mode to display: one of either `"count"` or
   `"size"`, defaulting to `"size"`.
+* `rotate`: whether visualization should use a rotate animation: boolean,
+  defaulting to `true`
 
 ### `disc.bundle(bundles, [opts], callback)` ###
 
