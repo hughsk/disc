@@ -58,7 +58,7 @@ if (!files.length) {
 function handle(bundles) {
   disc.bundle(bundles, {
     mode: argv.mode
-  , rotate: argv['no-rotate'] ? false : true
+  , rotate: argv.rotate
   }, function(err, html) {
     if (err) throw err
     if (argv.output) return fs.writeFileSync(argv.output, html)
