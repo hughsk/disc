@@ -126,6 +126,7 @@ function bundle(bundles, opts, callback) {
   var header = opts.header || opts.button || ''
   var footer = opts.footer || ''
 
+  if (opts.format === 'json') return json(bundles, callback)
   return json(bundles, function(err, data) {
     if (err) return callback(err)
 

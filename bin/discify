@@ -19,6 +19,10 @@ var argv = optimist
   .alias('o', 'output')
   .describe('o', 'Output path of the bundle. Defaults to stdout.')
 
+  .alias('f', 'format')
+  .default('f', 'html')
+  .describe('f', 'Specify output format: html, json')
+
   .alias('O', 'open')
   .describe('O', 'Opens disc in a new browser window automatically')
 
@@ -54,11 +58,14 @@ if (!files.length) {
 
 function handle(bundles) {
   disc.bundle(bundles, {
-    mode: argv.mode
-  }, function(err, html) {
+    mode: argv.mode,
+    format: argv.format
+  }, function(err, output) {
     if (err) throw err
-    if (argv.output) return fs.writeFileSync(argv.output, html)
-    if (!argv.open) return console.log(html)
+    if (argv.output && argv.format === 'html') return fs.writeFileSync(argv.output, output)
+    if (argv.output && argv.format === 'json') return fs.writeFileSync(argv.output, JSON.stringify(output, null, 2))
+    if (argv.format === 'json') return console.log(JSON.stringify(output, null, 2))
+    if (!argv.open) return console.log(output)
 
     // Create a temporary HTTP server, serve up
     // the index.html page and then close the
