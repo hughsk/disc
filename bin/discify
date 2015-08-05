@@ -78,9 +78,9 @@ function handle(bundles) {
 
       res.setHeader('content-type', 'text/html')
       res.end(html)
-    }).listen(12999, function(err) {
+    }).listen(function(err) {
       if (err) throw err
-      open('http://localhost:12999/')
+      open('http://localhost:' + server.address().port + '/')
     })
   })
 }
