@@ -62,6 +62,19 @@ function json(bundles, callback) {
 
   if (!modules.length) return
 
+  modules.forEach(function (m) {
+    if (! isAbsolute(m.id)) {
+        // modules included with browserify -r
+        if (m.id[0] == '.') {
+            // "-r ./foobar"
+            m.id = path.resolve(m.id);
+        } else {
+            // "-r foobar"
+            // assume it's under node_modules
+            m.id = path.join(path.resolve('node_modules', m.id), 'index.js');
+        }
+    }
+  });
   var browserifyModules = modules.filter(fromBrowserify(true))
   var otherModules = modules.filter(function(module) {
     if (path.basename(module.id) === '_empty.js') return false
@@ -94,6 +107,9 @@ function json(bundles, callback) {
 
   fileTree(ids, function(id, next) {
     var row = byid[id]
+    if (! row) {
+        return next(new Error('Unknown module ' + id + ', did you compile with --full-paths?'));
+    }
 
     next(null, {
         size: row.source.length
@@ -243,4 +259,8 @@ function isEmpty(module) {
     path.basename(module.id) === '_empty.js' &&
   (!fs.existsSync(module.id) || !fs.statSync(module.id).size)
   )
+}
+
+function isAbsolute(file) {
+    return file.match(/^([A-Za-z]:)?\/|\\/);
 }
