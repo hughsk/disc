@@ -36,10 +36,10 @@ Options:
                 either "count" or "size". Default: size
 ```
 
-When you install disc globally, you the `discify` command-line tool is made
-available as the quickest means of checking out your bundle. As of disc v1.0.0,
-this tool takes any bundled browserify script as input and spits out a
-standalone HTML page as output.
+When you install disc globally, the `discify` command-line tool is made
+available, and is the quickest way of checking out your bundle. As of 
+disc v1.0.0, this tool takes any bundled browserify script as input and
+spits out a standalone HTML page as output.
 
 For example:
 
