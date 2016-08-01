@@ -27,7 +27,7 @@
     "browser-unpack": "^1.1.1",
     "builtins": "1.0.3",
     "commondir": "1.0.1",
-    "d3": "^3.5.17",
+    "d3": "^4.2.0",
     "duplexer": "^0.1.1",
     "file-tree": "^1.0.0",
     "flatten": "1.0.2",
@@ -39,17 +39,19 @@
     "uniq": "^1.0.1"
   },
   "devDependencies": {
-    "autoprefixer": "^6.3.6",
-    "browserify": "^13.0.1",
+    "autoprefixer": "^6.3.7",
+    "browserify": "^13.1.0",
     "btoa": "^1.1.2",
-    "clean-css": "^3.4.18",
+    "clean-css": "^3.4.19",
     "domready": "^1.0.8",
-    "marked": "^0.3.5",
+    "marked": "^0.3.6",
+    "postcss": "^5.1.1",
     "prettysize": "0.0.3",
     "rework": "^1.0.1",
+    "rework-plugin-inline": "^1.0.1",
     "tap-spec": "^4.1.1",
     "tape": "^4.6.0",
-    "uglify-js": "^2.6.3"
+    "uglify-js": "^2.7.0"
   },
   "keywords": [
     "analyze",
