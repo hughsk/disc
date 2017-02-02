@@ -146,3 +146,10 @@ bundle is the result of shimming node's core functionality.
 
 Nothing particularly special about these palettes – colored for legibility and
 aesthetics respectively.
+
+## Development
+You will need [UglifyJS](https://github.com/mishoo/UglifyJS2) to install dependencies and begin development.
+
+``` bash
+npm install uglify-js -g
+```
