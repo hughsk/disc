@@ -23,7 +23,7 @@
   "license": "MIT",
   "readmeFilename": "README.md",
   "dependencies": {
-    "bl": "^0.7.0",
+    "bl": "^1.2.0",
     "browser-unpack": "^1.2.0",
     "builtins": "0.0.3",
     "commondir": "0.0.1",
