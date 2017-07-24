@@ -1,3 +1,29 @@
+node_modules/
+.idea/
+*.iml
+*.swp
+*.swo
+npm
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+
+# node-waf configuration
+.lock-wscript
+
+# Dependency directory
+node_modules
+
+# OSX
+.DS_Store
+lib
+
+# Project specific
 build
 index.html
-node_modules
