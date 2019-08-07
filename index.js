@@ -1,7 +1,6 @@
 var unpack = require('browser-unpack')
 var builtins = require('builtins')
 var through = require('through')
-var flatten = require('flatten')
 var duplex = require('duplexer')
 var pluck = require('plucker')
 var uniq = require('uniq')
@@ -17,6 +16,16 @@ var versions = require('./lib/versions')
 module.exports = createStream
 createStream.json = json
 createStream.bundle = bundle
+
+// TODO: When Node 10 support is dropped, replace this with Array.prototype.flat
+function flat (arr1) {
+  return arr1.reduce(
+    (acc, val) => Array.isArray(val)
+      ? acc.concat(flat(val))
+      : acc.concat(val),
+    []
+  )
+}
 
 function createStream(opts) {
   opts = opts || {}
@@ -39,7 +48,7 @@ function createStream(opts) {
 }
 
 function json(bundles, callback) {
-  var modules = flatten(bundles
+  var modules = flat(bundles
     .map(String)
     .map(unpack)
   ).map(function(module) {
