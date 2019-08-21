@@ -264,7 +264,7 @@ function values(object) {
 }
 
 function isEmpty(module) {
-  return (
+  return module.id === undefined || (
     path.basename(module.id) === '_empty.js' &&
   (!fs.existsSync(module.id) || !fs.statSync(module.id).size)
   )
