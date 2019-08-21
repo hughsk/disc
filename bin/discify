@@ -25,6 +25,9 @@ var argv = optimist
   .alias('m', 'mode')
   .describe('m', 'the default file scale mode to display: should be either "count" or "size". Default: size')
 
+  .alias('r', 'no-rotate')
+  .describe('r', 'Turns off rotate animation')
+
   .argv
 
 if (argv.help) {
@@ -55,6 +58,7 @@ if (!files.length) {
 function handle(bundles) {
   disc.bundle(bundles, {
     mode: argv.mode
+  , rotate: argv.rotate
   }, function(err, html) {
     if (err) throw err
     if (argv.output) return fs.writeFileSync(argv.output, html)

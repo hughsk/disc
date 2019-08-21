@@ -155,6 +155,7 @@ function bundle(bundles, opts, callback) {
     if (err) return callback(err)
 
     data.mode = opts.mode || 'size'
+    data.rotate = typeof opts.rotate === 'undefined' ? true : opts.rotate
     data = '<script type="text/javascript">'
       + ';window.disc = ('
       + JSON.stringify(data)

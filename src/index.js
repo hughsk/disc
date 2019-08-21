@@ -26,7 +26,7 @@ domready(function() {
     , width = window.innerWidth
     , height = Math.max(window.innerHeight - 100, 100)
     , radius = Math.min(width, height) * 0.45
-    , deg = 120
+    , deg = window.disc.rotate ? 120 : 0
 
   var svg = d3.select('.chart').append('svg')
       .attr('width', width)
@@ -219,12 +219,13 @@ domready(function() {
   // arcs back towards their original
   // position.
   //
-  groups.transition()
-    .duration(3250)
-    .delay(function(d, i) {
-      return d.x * 100 + (i % 4) * 250 + d.y / maxdepth * 0.25 + 250
-    })
-    .attrTween('transform', rotateTween(deg))
+  if (window.disc.rotate)
+    groups.transition()
+      .duration(3250)
+      .delay(function(d, i) {
+        return d.x * 100 + (i % 4) * 250 + d.y / maxdepth * 0.25 + 250
+      })
+      .attrTween('transform', rotateTween(deg))
 
   groups.on('mouseover', function(d) {
     highlight(d)
