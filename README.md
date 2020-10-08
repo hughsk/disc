@@ -16,7 +16,7 @@ make sure you have [node](http://nodejs.org/) installed on your machine first.
 Installing should then be as easy as:
 
 ``` bash
-sudo npm install -g disc
+npm install -g disc
 ```
 
 ## Command-Line Interface ##
